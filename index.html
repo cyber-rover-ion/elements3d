@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Chemistry Molecule Explorer | Interactive Molecular Physics</title>
+  <meta name="description" content="Explore 10 chemical molecules with interactive 3D rendering, ball-and-stick, space-filling, electron cloud, atomic labels, and structural analysis.">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header Navbar -->
+    <header>
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <circle cx="19" cy="5" r="2"></circle>
+            <circle cx="5" cy="19" r="2"></circle>
+            <path d="M12 9L19 5M12 15L5 19"></path>
+          </svg>
+        </div>
+        <span>CHEMIS3D EXPLORER</span>
+      </div>
+
+      <div class="header-controls">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search formula, name, element...">
+        </div>
+
+        <a href="https://github.com/cyber-rover-ion" target="_blank" rel="noopener noreferrer" class="creator-badge" title="View GitHub Profile of Jebin Pravinraj">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+          </svg>
+          <span>Created by <strong>Jebin Pravinraj</strong></span>
+        </a>
+
+        <button class="btn-icon" id="btn-sound" title="Toggle Audio Feedback">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Left Sidebar: Molecule Library & Filters -->
+    <aside class="sidebar-left">
+      <div class="filter-pills">
+        <button class="pill active" data-filter="all">All (40)</button>
+        <button class="pill" data-filter="Elements">Elements (20)</button>
+        <button class="pill" data-filter="Molecules">Molecules (20)</button>
+        <button class="pill" data-filter="Gases">Gases</button>
+        <button class="pill" data-filter="Acids/Bases">Acids & Bases</button>
+        <button class="pill" data-filter="Organic">Organic</button>
+        <button class="pill" data-filter="Inorganic">Inorganic</button>
+      </div>
+
+      <div class="molecule-list" id="molecule-list">
+        <!-- Dynamic Molecule Cards populated by JS -->
+      </div>
+
+      <div class="sidebar-footer">
+        <p>Created by <a href="https://github.com/cyber-rover-ion" target="_blank" rel="noopener noreferrer">Jebin Pravinraj</a> (@cyber-rover-ion)</p>
+      </div>
+    </aside>
+
+    <!-- Center 3D Viewport -->
+    <main class="viewport-container">
+      <div id="canvas-3d"></div>
+      <div id="labels-overlay"></div>
+
+      <!-- Floating 3D Control Toolbar -->
+      <div class="floating-toolbar">
+        <button class="tool-btn active" id="btn-mode-ballstick" data-mode="ballStick" title="Ball & Stick Representation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="4"></circle>
+            <circle cx="4" cy="4" r="2"></circle>
+            <line x1="6" y1="6" x2="9.5" y2="9.5"></line>
+          </svg>
+          Ball & Stick
+        </button>
+
+        <button class="tool-btn" id="btn-mode-spacefilling" data-mode="spaceFilling" title="Van der Waals Radii Space-Filling">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="8"></circle>
+          </svg>
+          Space-Filling
+        </button>
+
+        <button class="tool-btn" id="btn-mode-electron" data-mode="electronCloud" title="Electron Cloud Volumetric Aura">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9" stroke-dasharray="3 3"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          Electron Cloud
+        </button>
+
+        <button class="tool-btn" id="btn-mode-wireframe" data-mode="wireframe" title="Skeletal Wireframe">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+          Wireframe
+        </button>
+
+        <div class="tool-divider"></div>
+
+        <button class="tool-btn active" id="btn-toggle-labels" title="Toggle Atom Symbol Labels">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 7V4h16v3M9 20h6M12 4v16"></path>
+          </svg>
+          Labels
+        </button>
+
+        <button class="tool-btn active" id="btn-toggle-vibe" title="Toggle Thermal Vibration Physics">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12h4l3-9 6 18 3-9h4"></path>
+          </svg>
+          Vibration
+        </button>
+      </div>
+    </main>
+
+    <!-- Right Sidebar: Chemical Analysis & Atom Inspector -->
+    <aside class="sidebar-right">
+      <div class="panel-header">
+        <h2 id="mol-name">Water</h2>
+        <p id="mol-formula">H₂O • Oxidane</p>
+      </div>
+
+      <p id="mol-desc" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+        Essential polar molecule for all known life forms. Hydrogen bonding grants it unique liquid properties and high heat capacity.
+      </p>
+
+      <!-- Key Chemical Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span>Mass</span>
+          <strong id="mol-weight">18.015 g/mol</strong>
+        </div>
+        <div class="metric-card">
+          <span>Category</span>
+          <strong id="mol-category">Inorganic</strong>
+        </div>
+        <div class="metric-card">
+          <span>Polarity</span>
+          <strong id="mol-polarity">Polar</strong>
+        </div>
+        <div class="metric-card">
+          <span>Geometry</span>
+          <strong id="mol-geometry">Bent (104.5°)</strong>
+        </div>
+      </div>
+
+      <!-- Elemental Composition Breakdown -->
+      <div>
+        <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">Elemental Breakdown</h4>
+        <div class="composition-bar" id="composition-bar"></div>
+        <div class="comp-legend" id="composition-legend"></div>
+      </div>
+
+      <!-- Interactive Atom Inspector -->
+      <div class="atom-inspector">
+        <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent-cyan); letter-spacing: 0.5px; margin-bottom: 10px;">
+          3D Atom Inspector
+        </h4>
+        <div id="inspector-content">
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Click on any atom in the 3D viewport to inspect its elemental properties, hybridization, and bonding.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module" src="./src/js/app.js"></script>
+</body>
+</html>
