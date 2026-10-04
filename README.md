@@ -12,3 +12,6 @@ Interactive 3D visualization of chemical elements 1–30 with rotatable and zoom
 ## Status
 
 The project is a browser-based educational visualization and can be opened locally or deployed as a static web experience.
+## Creator
+
+Made by **JebinTech**.
