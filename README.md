@@ -8,13 +8,13 @@ elements3d provides an interactive way to explore the first 30 chemical elements
 
 ## Features
 
-- 🧪 Elements 1–30
-- 🌐 Browser-based experience
-- 🧊 Interactive 3D atomic models
-- 🔍 Rotate and zoom the visualization
-- ⚛️ Electron-configuration information
-- 📚 Educational element reference
-- ⚡ Lightweight static-web architecture
+-  Elements 1–30
+-  Browser-based experience
+-  Interactive 3D atomic models
+-  Rotate and zoom the visualization
+-  Electron-configuration information
+-  Educational element reference
+-  Lightweight static-web architecture
 
 ## Technology
 
