@@ -1,20 +1,18 @@
 # elements3d
 
-Interactive 3D visualization of chemical elements 1–30, combining browser-based 3D graphics with educational element data.
+An interactive 3D chemistry visualization for exploring chemical elements through browser-based graphics and element data.
 
 ## Overview
 
-elements3d provides an interactive way to explore the first 30 chemical elements through rotatable and zoomable Bohr-style atomic models, electron configurations, and basic element information.
+elements3d presents atomic models for elements 1 through 30 in an interactive web interface. Users can inspect the models, rotate and zoom the 3D view, and view basic information such as electron configuration.
 
 ## Features
 
--  Elements 1–30
--  Browser-based experience
--  Interactive 3D atomic models
--  Rotate and zoom the visualization
--  Electron-configuration information
--  Educational element reference
--  Lightweight static-web architecture
+- Interactive 3D atomic models
+- Elements 1 through 30
+- Rotate and zoom controls
+- Electron configuration information
+- Browser-based educational interface
 
 ## Technology
 
@@ -22,29 +20,28 @@ elements3d provides an interactive way to explore the first 30 chemical elements
 - CSS
 - JavaScript
 - Three.js
+- Vite
+- Lucide
 
 ## Usage
 
-Open the project in a modern browser or serve the project directory with a local static web server.
+Install the project dependencies and start the Vite development server:
 
-Select an element and use the interactive 3D controls to inspect its model and information.
+```bash
+npm install
+npm run dev
+```
 
-## Project Scope
+For a production build:
 
-The project is intended as an educational visualization rather than a replacement for a full chemistry reference. The current focus is the first 30 elements and their visual exploration.
+```bash
+npm run build
+```
 
-## Future Ideas
+## Scope
 
-- More elements
-- Improved atomic visualizations
-- Additional chemistry data
-- Search and filtering
-- Better mobile controls
-- Educational interaction modes
+The project is an educational visualization focused on the first 30 elements. It is not intended to replace a complete chemistry reference.
 
 ## Creator
 
 Made by **JebinTech**.
-
----
-An educational 3D chemistry experiment by **JebinTech**.
