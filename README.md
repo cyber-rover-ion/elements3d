@@ -1,18 +1,18 @@
 # elements3d
 
-An interactive 3D chemistry visualization for exploring chemical elements through browser-based graphics and element data.
+An interactive 3D chemistry learning experience for exploring atomic models and selected properties of the first 30 chemical elements.
 
 ## Overview
 
-elements3d presents atomic models for elements 1 through 30 in an interactive web interface. Users can inspect the models, rotate and zoom the 3D view, and view basic information such as electron configuration.
+elements3d presents browser-based visualizations designed to make introductory chemistry concepts easier to explore. Users can inspect element information and interact with 3D atomic models using the available view controls.
 
 ## Features
 
 - Interactive 3D atomic models
-- Elements 1 through 30
+- Coverage of elements 1–30
 - Rotate and zoom controls
 - Electron configuration information
-- Browser-based educational interface
+- Browser-based learning interface
 
 ## Technology
 
@@ -23,25 +23,30 @@ elements3d presents atomic models for elements 1 through 30 in an interactive we
 - Vite
 - Lucide
 
-## Usage
+## Getting Started
 
-Install the project dependencies and start the Vite development server:
+Install dependencies:
 
 ```bash
 npm install
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-For a production build:
+Create a production build:
 
 ```bash
 npm run build
 ```
 
-## Scope
+## Educational Scope
 
-The project is an educational visualization focused on the first 30 elements. It is not intended to replace a complete chemistry reference.
+This project is an interactive learning aid, not a substitute for a comprehensive chemistry textbook or authoritative scientific reference. Atomic models are visual representations intended to support learning.
 
-## Creator
+## Maintainer
 
-Made by **JebinTech**.
+**JebinTech**
