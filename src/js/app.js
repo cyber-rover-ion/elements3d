@@ -88,15 +88,13 @@ class App {
 
   renderMoleculeList() {
     const listContainer = document.getElementById('molecule-list');
-    listContainer.innerHTML = '';
+    listContainer.replaceChildren();
 
     const filtered = this.molecules.filter(mol => {
-      const matchesSearch = mol.name.toLowerCase().includes(this.searchQuery) ||
-                            mol.formula.toLowerCase().includes(this.searchQuery) ||
-                            mol.iupac.toLowerCase().includes(this.searchQuery);
+      const matchesSearch = [mol.name, mol.formula, mol.iupac]
+        .some(value => String(value || '').toLowerCase().includes(this.searchQuery));
 
       if (!matchesSearch) return false;
-
       if (this.activeFilter === 'all') return true;
       if (this.activeFilter === 'Elements') return mol.category.includes('Elements');
       if (this.activeFilter === 'Molecules') return !mol.category.startsWith('Elements');
@@ -104,31 +102,55 @@ class App {
       if (this.activeFilter === 'Acids/Bases') return mol.category.includes('Acids/Bases');
       if (this.activeFilter === 'Organic') return mol.category.includes('Organic');
       if (this.activeFilter === 'Inorganic') return mol.category.includes('Inorganic');
-
       return true;
     });
+
+    if (filtered.length === 0) {
+      const emptyState = document.createElement('p');
+      emptyState.className = 'molecule-list-empty';
+      emptyState.textContent = 'No matching elements or molecules found.';
+      listContainer.appendChild(emptyState);
+      return;
+    }
 
     filtered.forEach(mol => {
       const card = document.createElement('div');
       card.className = `molecule-card ${mol.id === this.currentMolecule.id ? 'active' : ''}`;
-      card.innerHTML = `
-        <div class="molecule-card-info">
-          <h4>${mol.name}</h4>
-          <p>${mol.geometry}</p>
-        </div>
-        <span class="molecule-card-badge">${mol.formula}</span>
-      `;
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-pressed', String(mol.id === this.currentMolecule.id));
 
-      card.addEventListener('click', () => {
+      const info = document.createElement('div');
+      info.className = 'molecule-card-info';
+      const name = document.createElement('h4');
+      name.textContent = mol.name;
+      const geometry = document.createElement('p');
+      geometry.textContent = mol.geometry;
+      info.append(name, geometry);
+
+      const badge = document.createElement('span');
+      badge.className = 'molecule-card-badge';
+      badge.textContent = mol.formula;
+      card.append(info, badge);
+
+      const selectMolecule = () => {
         if (this.currentMolecule.id !== mol.id) {
           audio.playSwitchMolecule();
           this.loadMolecule(mol.id);
+        }
+      };
+      card.addEventListener('click', selectMolecule);
+      card.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          selectMolecule();
         }
       });
 
       listContainer.appendChild(card);
     });
   }
+
 
   loadMolecule(moleculeId) {
     const mol = this.molecules.find(m => m.id === moleculeId);
@@ -162,73 +184,99 @@ class App {
   renderElementalBreakdown(mol) {
     const bar = document.getElementById('composition-bar');
     const legend = document.getElementById('composition-legend');
-    bar.innerHTML = '';
-    legend.innerHTML = '';
+    bar.replaceChildren();
+    legend.replaceChildren();
 
     const elementCounts = {};
-    let totalAtoms = mol.atoms.length;
+    const atoms = Array.isArray(mol.atoms) ? mol.atoms : [];
+    const totalAtoms = atoms.length;
 
-    mol.atoms.forEach(atom => {
+    if (totalAtoms === 0) {
+      const emptyState = document.createElement('p');
+      emptyState.textContent = 'Composition data is not available.';
+      legend.appendChild(emptyState);
+      return;
+    }
+
+    atoms.forEach(atom => {
       elementCounts[atom.element] = (elementCounts[atom.element] || 0) + 1;
     });
 
-    Object.keys(elementCounts).forEach(symbol => {
-      const count = elementCounts[symbol];
+    Object.entries(elementCounts).forEach(([symbol, count]) => {
       const pct = (count / totalAtoms) * 100;
       const elemData = ELEMENT_DATA[symbol] || ELEMENT_DATA.C;
 
-      // Progress bar segment
       const segment = document.createElement('div');
       segment.className = 'comp-segment';
       segment.style.width = `${pct}%`;
       segment.style.backgroundColor = elemData.color;
       segment.title = `${elemData.name}: ${count} (${pct.toFixed(1)}%)`;
+      segment.setAttribute('aria-label', segment.title);
       bar.appendChild(segment);
 
-      // Legend item
       const item = document.createElement('div');
       item.className = 'legend-item';
-      item.innerHTML = `
-        <div class="dot" style="background-color: ${elemData.color};"></div>
-        <span>${symbol} (${count})</span>
-      `;
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.style.backgroundColor = elemData.color;
+      const label = document.createElement('span');
+      label.textContent = `${symbol} (${count})`;
+      item.append(dot, label);
       legend.appendChild(item);
     });
   }
 
+
   updateAtomInspector(atomData, elemData) {
     const inspector = document.getElementById('inspector-content');
-    inspector.innerHTML = `
-      <div class="atom-inspector-header">
-        <div class="atom-symbol-badge" style="background-color: ${elemData.color}; color: ${atomData.element === 'H' ? '#1a202c' : '#fff'}">
-          ${atomData.element}
-        </div>
-        <div class="atom-inspector-details">
-          <strong style="font-size: 1rem; color: #fff;">${elemData.name} (Atom #${atomData.id + 1})</strong>
-          <p>Orbital Hybridization: <span style="color: var(--accent-cyan); font-weight: 600;">${atomData.hybridization}</span></p>
-        </div>
-      </div>
+    inspector.replaceChildren();
 
-      <div class="atom-inspector-grid">
-        <div class="metric-card">
-          <span>Atomic Number</span>
-          <strong>${elemData.number}</strong>
-        </div>
-        <div class="metric-card">
-          <span>Atomic Mass</span>
-          <strong>${elemData.mass} u</strong>
-        </div>
-        <div class="metric-card">
-          <span>Electronegativity</span>
-          <strong>${elemData.electronegativity}</strong>
-        </div>
-        <div class="metric-card">
-          <span>VdW Radius</span>
-          <strong>${elemData.vdwRadius} Å</strong>
-        </div>
-      </div>
-    `;
+    const header = document.createElement('div');
+    header.className = 'atom-inspector-header';
+
+    const symbol = document.createElement('div');
+    symbol.className = 'atom-symbol-badge';
+    symbol.style.backgroundColor = elemData.color;
+    symbol.style.color = atomData.element === 'H' ? '#1a202c' : '#fff';
+    symbol.textContent = String(atomData.element || '?');
+
+    const details = document.createElement('div');
+    details.className = 'atom-inspector-details';
+    const name = document.createElement('strong');
+    name.style.fontSize = '1rem';
+    name.style.color = '#fff';
+    name.textContent = `${elemData.name} (Atom #${Number(atomData.id) + 1})`;
+    const hybridization = document.createElement('p');
+    const hybridizationLabel = document.createElement('span');
+    hybridizationLabel.style.color = 'var(--accent-cyan)';
+    hybridizationLabel.style.fontWeight = '600';
+    hybridizationLabel.textContent = String(atomData.hybridization || 'Not specified');
+    hybridization.append('Orbital Hybridization: ', hybridizationLabel);
+    details.append(name, hybridization);
+    header.append(symbol, details);
+    inspector.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'atom-inspector-grid';
+    const metrics = [
+      ['Atomic Number', elemData.number],
+      ['Atomic Mass', `${elemData.mass} u`],
+      ['Electronegativity', elemData.electronegativity],
+      ['VdW Radius', `${elemData.vdwRadius} Å`]
+    ];
+    metrics.forEach(([labelText, value]) => {
+      const card = document.createElement('div');
+      card.className = 'metric-card';
+      const label = document.createElement('span');
+      label.textContent = labelText;
+      const metric = document.createElement('strong');
+      metric.textContent = String(value ?? '—');
+      card.append(label, metric);
+      grid.appendChild(card);
+    });
+    inspector.appendChild(grid);
   }
+
 }
 
 // Initialize Application
