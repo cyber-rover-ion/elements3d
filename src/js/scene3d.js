@@ -4,15 +4,16 @@ import { ELEMENT_DATA } from './molecules.js';
 export class MoleculeScene {
   constructor(container) {
     this.container = container;
-    this.width = container.clientWidth;
-    this.height = container.clientHeight;
+    this.width = Math.max(1, container.clientWidth);
+    this.height = Math.max(1, container.clientHeight);
 
     // State
     this.currentMolecule = null;
     this.renderMode = 'ballStick'; // 'ballStick', 'spaceFilling', 'wireframe', 'electronCloud'
     this.showLabels = true;
-    this.vibrationEnabled = true;
-    this.autoRotate = true;
+    this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.vibrationEnabled = !this.prefersReducedMotion;
+    this.autoRotate = !this.prefersReducedMotion;
 
     // Object maps
     this.atomMeshes = [];
@@ -43,7 +44,7 @@ export class MoleculeScene {
     // 3. Renderer setup
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -375,8 +376,8 @@ export class MoleculeScene {
   }
 
   onWindowResize() {
-    this.width = this.container.clientWidth;
-    this.height = this.container.clientHeight;
+    this.width = Math.max(1, this.container.clientWidth);
+    this.height = Math.max(1, this.container.clientHeight);
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(this.width, this.height);
