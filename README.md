@@ -50,3 +50,6 @@ This project is an interactive learning aid, not a substitute for a comprehensiv
 ## Maintainer
 
 **JebinTech**
+
+- GitHub: [@cyber-rover-ion](https://github.com/cyber-rover-ion)
+- Instagram: [@constantine.hell](https://www.instagram.com/constantine.hell/)
