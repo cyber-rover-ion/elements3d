@@ -233,14 +233,26 @@ export class MoleculeScene {
   }
 
   clearMolecule() {
-    this.atomMeshes.forEach(mesh => this.moleculeGroup.remove(mesh));
-    this.bondMeshes.forEach(mesh => this.moleculeGroup.remove(mesh));
-    this.cloudMeshes.forEach(mesh => this.moleculeGroup.remove(mesh));
+    const disposeObject = (object) => {
+      object.traverse((child) => {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          const materials = Array.isArray(child.material) ? child.material : [child.material];
+          materials.forEach((material) => material.dispose());
+        }
+      });
+      this.moleculeGroup.remove(object);
+    };
+
+    this.atomMeshes.forEach(disposeObject);
+    this.bondMeshes.forEach(disposeObject);
+    this.cloudMeshes.forEach(disposeObject);
 
     this.atomMeshes = [];
     this.bondMeshes = [];
     this.cloudMeshes = [];
     this.selectedAtomId = null;
+    this.hoveredAtomId = null;
 
     // Remove 2D HTML Labels
     this.clearLabels();
