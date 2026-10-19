@@ -232,17 +232,24 @@ export class MoleculeScene {
   }
 
   clearMolecule() {
-    this.atomMeshes.forEach(mesh => this.moleculeGroup.remove(mesh));
-    this.bondMeshes.forEach(mesh => this.moleculeGroup.remove(mesh));
-    this.cloudMeshes.forEach(mesh => this.moleculeGroup.remove(mesh));
-
+    // Dispose GPU resources before removing objects to prevent leaks when
+    // users switch between molecules repeatedly.
+    this.moleculeGroup.traverse((object) => {
+      if (object.geometry) object.geometry.dispose();
+      if (object.material) {
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        materials.forEach((material) => material.dispose());
+      }
+    });
+    while (this.moleculeGroup.children.length) {
+      this.moleculeGroup.remove(this.moleculeGroup.children[0]);
+    }
     this.atomMeshes = [];
     this.bondMeshes = [];
     this.cloudMeshes = [];
-    this.selectedAtomId = null;
-
-    // Remove 2D HTML Labels
-    this.clearLabels();
+    this.labelElements.forEach((element) => element.remove());
+    this.labelElements = [];
+    this.hoveredAtomId = null;
   }
 
   setRenderMode(mode) {
